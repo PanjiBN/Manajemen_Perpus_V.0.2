@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
 package manajemenperpustakaan;
+import manajemenperpustakaan.view.LoginPage;
 
 /**
  *
@@ -15,6 +16,8 @@ public class ManajemenPerpustakaan {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        LoginPage lp = new LoginPage();
+        lp.setLocationRelativeTo(null);
+        lp.setVisible(true);
     }
-    
 }
