@@ -3,18 +3,59 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package manajemenperpustakaan.view;
+import java.util.List;
+import java.util.regex.PatternSyntaxException;
+import javax.swing.JOptionPane;
+import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import manajemenperpustakaan.model.BukuFiksi;
+import manajemenperpustakaan.dao.BukuFiksiDAO;
 
 /**
  *
  * @author Panji
  */
 public class PageFiksi extends javax.swing.JFrame {
-
+    BukuFiksiDAO fdao = new BukuFiksiDAO();
+    TableRowSorter<TableModel> sorter;
+    
     /**
      * Creates new form PageFiksi
      */
     public PageFiksi() {
         initComponents();
+        loadData();
+    }
+    
+    public void loadData(){
+        List<BukuFiksi> list = fdao.getAll();
+        DefaultTableModel model = new DefaultTableModel(
+            new Object[]{"ID Buku", "Judul", "Pengarang", "Penerbit", "Genre", "Deskripsi", 
+                "Dapat dipinjam", "Sedang dipinjam"}, 0);
+        tblFiksi.setModel(model);
+        sorter = new TableRowSorter<TableModel>(model);
+        tblFiksi.setRowSorter(sorter);
+        for(BukuFiksi f : list){
+            model.addRow(new Object[]{
+                f.getIdBuku(),
+                f.getJudul(),
+                f.getPengarang(),
+                f.getPenerbit(),
+                f.getGenre(),
+                f.getDeskripsi(),
+                f.getDapatDipinjam() + " buku",
+                f.getSedangDipinjam() + " buku"
+            });
+        }
+    }
+    
+    private Integer getSelectedId(){
+        int row = tblFiksi.getSelectedRow();
+        if(row == -1)
+            return null;
+        return Integer.parseInt(tblFiksi.getValueAt(row, 0).toString());
     }
 
     /**
@@ -33,6 +74,7 @@ public class PageFiksi extends javax.swing.JFrame {
         btnTambah = new javax.swing.JButton();
         btnPinjam = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        btnHapus = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         txtSearch = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
@@ -54,10 +96,27 @@ public class PageFiksi extends javax.swing.JFrame {
         });
 
         btnTambah.setText("Tambah Buku");
+        btnTambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTambahActionPerformed(evt);
+            }
+        });
 
         btnPinjam.setText("Pinjam Buku");
+        btnPinjam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPinjamActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Buku Fiksi");
+
+        btnHapus.setText("Hapus Buku");
+        btnHapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHapusActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -66,17 +125,18 @@ public class PageFiksi extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnKeluar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnTambah, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnPinjam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(44, 44, 44)
-                        .addComponent(jLabel2)))
+                        .addComponent(jLabel2))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnKeluar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTambah, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnPinjam, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnHapus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -90,6 +150,8 @@ public class PageFiksi extends javax.swing.JFrame {
                 .addComponent(btnTambah)
                 .addGap(18, 18, 18)
                 .addComponent(btnPinjam)
+                .addGap(18, 18, 18)
+                .addComponent(btnHapus)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnKeluar)
                 .addContainerGap())
@@ -119,7 +181,7 @@ public class PageFiksi extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID Buku", "Judul", "Pengarang", "Penerbit", "Genre/Kategori", "Deskripsi", "Dapat dipinjam", "Sedang dipinjam"
+                "ID Buku", "Judul", "Pengarang", "Penerbit", "Genre", "Deskripsi", "Dapat dipinjam", "Sedang dipinjam"
             }
         ));
         jScrollPane1.setViewportView(tblFiksi);
@@ -192,15 +254,69 @@ public class PageFiksi extends javax.swing.JFrame {
 
     private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
         // TODO add your handling code here:
+        HomePage hp = new HomePage();
+        hp.setLocationRelativeTo(null);
+        hp.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnKeluarActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         // TODO add your handling code here:
+        String text = txtSearch.getText();
+        
+        if(text.length() == 0){
+            sorter.setRowFilter(null);
+        }
+        else{
+            try{
+                sorter.setRowFilter(RowFilter.regexFilter(text));
+            }
+            catch(PatternSyntaxException pse){
+                System.out.println("Bad regex pattern");
+            }
+        }
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         // TODO add your handling code here:
+        loadData();
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
+        // TODO add your handling code here:
+        FormFiksi ff = new FormFiksi(this, null);
+        ff.setLocationRelativeTo(this);
+        ff.setVisible(true);
+    }//GEN-LAST:event_btnTambahActionPerformed
+
+    private void btnPinjamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPinjamActionPerformed
+        // TODO add your handling code here:
+        Integer id = getSelectedId();
+        if(id == null){
+            JOptionPane.showMessageDialog(this, "Pilih buku dulu!");
+            return;
+        }
+        
+        FormFiksi ff = new FormFiksi(this, id);
+        ff.setLocationRelativeTo(this);
+        ff.setVisible(true);
+    }//GEN-LAST:event_btnPinjamActionPerformed
+
+    private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
+        // TODO add your handling code here:
+        Integer id = getSelectedId();
+        if(id == null){
+            JOptionPane.showMessageDialog(this, "Pilih buku dulu!");
+            return;
+        }
+        
+        if(JOptionPane.showConfirmDialog(
+                this, "Hapus data buku ini?", "Konfirmasi",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+            fdao.delete(id);
+            loadData();
+        }
+    }//GEN-LAST:event_btnHapusActionPerformed
 
     /**
      * @param args the command line arguments
@@ -238,6 +354,7 @@ public class PageFiksi extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnHapus;
     private javax.swing.JButton btnKeluar;
     private javax.swing.JButton btnPinjam;
     private javax.swing.JButton btnRefresh;

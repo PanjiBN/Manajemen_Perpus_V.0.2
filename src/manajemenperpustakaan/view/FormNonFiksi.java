@@ -3,20 +3,53 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package manajemenperpustakaan.view;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import manajemenperpustakaan.model.BukuNonFiksi;
+import manajemenperpustakaan.dao.BukuNonFiksiDAO;
 
 /**
  *
  * @author Panji
  */
 public class FormNonFiksi extends javax.swing.JFrame {
-
+    private Integer id;
+    private PageNonFiksi parent;
+    private BukuNonFiksiDAO nfdao = new BukuNonFiksiDAO();
     /**
      * Creates new form FormNonFiksi
      */
     public FormNonFiksi() {
         initComponents();
     }
-
+    
+    public FormNonFiksi(PageNonFiksi parent, Integer id){
+        initComponents();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.parent = parent;
+        this.id = id;
+        
+        if(id != null){
+            setTitle("Pinjam Buku");
+            loadData();
+        }
+        else{
+            setTitle("Tambah Buku");
+        }
+    }
+    
+    private void loadData(){
+        BukuNonFiksi bnf = nfdao.getById(id);
+        if(bnf != null){
+            txtJudul.setText(bnf.getJudul());
+            txtPengarang.setText(bnf.getPengarang());
+            txtPenerbit.setText(bnf.getPenerbit());
+            txtKategori.setText(bnf.getKategori());
+            txtDeskripsi.setText(bnf.getDeskripsi());
+            txtDptPinjam.setText(String.valueOf(bnf.getDapatDipinjam()));
+            txtSdgPinjam.setText(String.valueOf(bnf.getSedangDipinjam()));
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,9 +73,10 @@ public class FormNonFiksi extends javax.swing.JFrame {
         txtPenerbit = new javax.swing.JTextField();
         txtKategori = new javax.swing.JTextField();
         txtDeskripsi = new javax.swing.JTextField();
-        txtDptpinjam = new javax.swing.JTextField();
+        txtDptPinjam = new javax.swing.JTextField();
         txtSdgPinjam = new javax.swing.JTextField();
         btnSimpan = new javax.swing.JButton();
+        btnBatal = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -88,12 +122,26 @@ public class FormNonFiksi extends javax.swing.JFrame {
         });
         jPanel2.add(txtKategori, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 190, 260, -1));
         jPanel2.add(txtDeskripsi, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 220, 260, -1));
-        jPanel2.add(txtDptpinjam, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 260, -1));
+        jPanel2.add(txtDptPinjam, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 260, -1));
         jPanel2.add(txtSdgPinjam, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, 260, -1));
 
         btnSimpan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnSimpan.setText("Simpan");
-        jPanel2.add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 320, -1, -1));
+        btnSimpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSimpanActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnSimpan, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 320, -1, -1));
+
+        btnBatal.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBatal.setText("Batal");
+        btnBatal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBatalActionPerformed(evt);
+            }
+        });
+        jPanel2.add(btnBatal, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 320, -1, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/Ilustrasi daftar resto menu minuman landscape (1).png"))); // NOI18N
         jLabel1.setText("jLabel1");
@@ -127,6 +175,55 @@ public class FormNonFiksi extends javax.swing.JFrame {
     private void txtKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtKategoriActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtKategoriActionPerformed
+
+    private void btnSimpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanActionPerformed
+        // TODO add your handling code here:
+        BukuNonFiksi nf = new BukuNonFiksi();
+        int error = 0;
+        nf.setJudul(txtJudul.getText());
+        nf.setPengarang(txtPengarang.getText());
+        nf.setPenerbit(txtPenerbit.getText());
+        nf.setKategori(txtKategori.getText());
+        nf.setDeskripsi(txtDeskripsi.getText());
+        try{
+            nf.setDapatDipinjam(Integer.parseInt(txtDptPinjam.getText()));
+        }
+        catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null, "Data jumlah buku harus angka!");
+            error++;
+        }
+        try{
+            nf.setSedangDipinjam(Integer.parseInt(txtSdgPinjam.getText()));
+        }
+        catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null, "Data jumlah buku harus angka!");
+            error++;
+        }
+        
+        boolean sukses;
+        if(error == 0){
+            if(id == null){
+                sukses = nfdao.insert(nf);
+            }
+            else{
+                nf.setIdBuku(id);
+                sukses = nfdao.update(nf);
+            }
+            if(sukses){
+                JOptionPane.showMessageDialog(this, "Data berhasil disimpan!");
+                parent.loadData();
+                dispose();
+            }
+            else{
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan!");
+            }
+        }
+    }//GEN-LAST:event_btnSimpanActionPerformed
+
+    private void btnBatalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBatalActionPerformed
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_btnBatalActionPerformed
 
     /**
      * @param args the command line arguments
@@ -164,6 +261,7 @@ public class FormNonFiksi extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBatal;
     private javax.swing.JButton btnSimpan;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
@@ -176,7 +274,7 @@ public class FormNonFiksi extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtDeskripsi;
-    private javax.swing.JTextField txtDptpinjam;
+    private javax.swing.JTextField txtDptPinjam;
     private javax.swing.JTextField txtJudul;
     private javax.swing.JTextField txtKategori;
     private javax.swing.JTextField txtPenerbit;

@@ -87,10 +87,18 @@ public class HomePage extends javax.swing.JFrame {
 
     private void btnFiksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiksiActionPerformed
         // TODO add your handling code here:
+        PageFiksi pf = new PageFiksi();
+        pf.setLocationRelativeTo(null);
+        pf.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnFiksiActionPerformed
 
     private void bntNonFiksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntNonFiksiActionPerformed
         // TODO add your handling code here:
+        PageNonFiksi pnf = new PageNonFiksi();
+        pnf.setLocationRelativeTo(null);
+        pnf.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_bntNonFiksiActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
